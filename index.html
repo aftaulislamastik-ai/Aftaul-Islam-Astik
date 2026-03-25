@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <title>Commune</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              cyber: {
+                dark: '#020617', // Slate 950
+                panel: '#0f172a', // Slate 900
+                accent: '#8b5cf6', // Violet 500
+                neon: '#06b6d4', // Cyan 500
+                danger: '#ef4444',
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glow': 'glow 2s ease-in-out infinite alternate',
+              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+            },
+            keyframes: {
+              glow: {
+                '0%': { boxShadow: '0 0 5px #8b5cf6, 0 0 10px #8b5cf6' },
+                '100%': { boxShadow: '0 0 20px #06b6d4, 0 0 30px #06b6d4' },
+              },
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Rajdhani', sans-serif;
+        background-color: #020617;
+        color: #e2e8f0;
+        overflow: hidden;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #334155;
+      }
+      
+      /* Glitch Avatar Effect */
+      .glitch-avatar-container {
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .glitch-avatar {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .glitch-avatar-container:hover .glitch-avatar {
+        animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+      }
+      
+      .glitch-avatar-container::before,
+      .glitch-avatar-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: inherit;
+        z-index: 2;
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .glitch-avatar-container:hover::before {
+        opacity: 0.5;
+        background-color: rgba(6, 182, 212, 0.3);
+        mix-blend-mode: screen;
+        animation: glitch-anim-1 0.4s cubic-bezier(.25, .46, .45, .94) both infinite;
+      }
+      
+      .glitch-avatar-container:hover::after {
+        opacity: 0.5;
+        background-color: rgba(139, 92, 246, 0.3);
+        mix-blend-mode: multiply;
+        animation: glitch-anim-2 0.4s cubic-bezier(.25, .46, .45, .94) both infinite reverse;
+      }
+      
+      @keyframes glitch-anim {
+        0% { transform: translate(0) }
+        20% { transform: translate(-2px, 2px) }
+        40% { transform: translate(-2px, -2px) }
+        60% { transform: translate(2px, 2px) }
+        80% { transform: translate(2px, -2px) }
+        100% { transform: translate(0) }
+      }
+      
+      @keyframes glitch-anim-1 {
+        0% { clip-path: inset(20% 0 80% 0); transform: translate(-4px, 1px); }
+        20% { clip-path: inset(60% 0 10% 0); transform: translate(4px, -1px); }
+        40% { clip-path: inset(40% 0 50% 0); transform: translate(-4px, 2px); }
+        60% { clip-path: inset(80% 0 5% 0); transform: translate(4px, -2px); }
+        80% { clip-path: inset(10% 0 70% 0); transform: translate(-4px, 1px); }
+        100% { clip-path: inset(30% 0 50% 0); transform: translate(4px, -1px); }
+      }
+      
+      @keyframes glitch-anim-2 {
+        0% { clip-path: inset(10% 0 60% 0); transform: translate(4px, -1px); }
+        20% { clip-path: inset(30% 0 20% 0); transform: translate(-4px, 1px); }
+        40% { clip-path: inset(70% 0 10% 0); transform: translate(4px, -2px); }
+        60% { clip-path: inset(20% 0 50% 0); transform: translate(-4px, 2px); }
+        80% { clip-path: inset(50% 0 30% 0); transform: translate(4px, -1px); }
+        100% { clip-path: inset(5% 0 80% 0); transform: translate(-4px, 1px); }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+    "firebase/": "https://esm.sh/firebase@^12.8.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "3rd Commune - Cyber Messaging",
+  "description": "A futuristic, cyber-dark messaging application featuring stealth messages, scratch cards, time capsules, and AI integration.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

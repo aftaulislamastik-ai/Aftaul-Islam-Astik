@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Private user data",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "avatar": { "type": "string" },
+        "status": { "type": "string", "enum": ["online", "busy", "offline"] },
+        "lastSeen": { "type": "number" },
+        "bio": { "type": "string" },
+        "gender": { "type": "string", "enum": ["male", "female", "other", "unspecified"] },
+        "dob": { "type": "string" },
+        "blockedIds": { "type": "array", "items": { "type": "string" } },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["id", "name"]
+    },
+    "Profile": {
+      "title": "Profile",
+      "description": "Public user profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "avatar": { "type": "string" },
+        "status": { "type": "string", "enum": ["online", "busy", "offline"] },
+        "bio": { "type": "string" },
+        "isAi": { "type": "boolean" }
+      },
+      "required": ["id", "name", "avatar"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "A chat session between two users",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "participantIds": { "type": "array", "items": { "type": "string" } },
+        "participantsData": { "type": "object" },
+        "createdAt": { "type": "object", "description": "Firestore server timestamp" },
+        "updatedAt": { "type": "object" },
+        "lastMessage": { "type": "object" },
+        "status": { "type": "string", "enum": ["pending", "accepted"] },
+        "initiatedBy": { "type": "string" },
+        "unreadCount": { "type": "object" }
+      },
+      "required": ["id", "participantIds"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message within a chat",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "content": { "type": "string" },
+        "type": { "type": "string", "enum": ["text", "image", "system"] },
+        "status": { "type": "string", "enum": ["pushed", "decrypted", "ignored"] },
+        "timestamp": { "type": "object" }
+      },
+      "required": ["senderId", "content", "type"]
+    },
+    "Call": {
+      "title": "Call",
+      "description": "An audio or video call session",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "callerId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "type": { "type": "string", "enum": ["audio", "video"] },
+        "status": { "type": "string", "enum": ["ringing", "accepted", "rejected", "ended", "missed"] },
+        "timestamp": { "type": "object" },
+        "peerId": { "type": "string" }
+      },
+      "required": ["id", "callerId", "receiverId", "type", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user data"
+    },
+    "/profiles/{profileId}": {
+      "schema": "Profile",
+      "description": "Public user profiles"
+    },
+    "/chats/{chatId}": {
+      "schema": "Chat",
+      "description": "Chat sessions"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages in a chat"
+    },
+    "/calls/{callId}": {
+      "schema": "Call",
+      "description": "Call signaling documents"
+    }
+  }
+}

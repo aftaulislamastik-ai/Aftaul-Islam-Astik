@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.uid == "s0M7k37u13T9kqUl2II2bwmLK8e2" || 
+         request.auth.token.email == "aftaulislamastik@gmail.com" ||
+         request.auth.token.email == "astikislam@gmail.com");
+    }
+
+    // Data type and size validation
+    function isValidString(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidUser(data) {
+      let allowedFields = ['id', 'name', 'avatar', 'status', 'bio', 'isAi', 'lastSeen', 'email', 'searchKey', 'blockedIds', 'createdAt', 'gender', 'dob', 'emailVerified', 'fcmToken'];
+      return data.keys().hasOnly(allowedFields) &&
+             (!('name' in data) || isValidString(data.name, 50)) &&
+             (!('bio' in data) || isValidString(data.bio, 500)) &&
+             (!('status' in data) || isValidString(data.status, 20)) &&
+             (!('email' in data) || data.email.matches('^.+@.+\\..+$'));
+    }
+
+    function isValidChat(data) {
+      return data.keys().hasAll(['id', 'participantIds', 'participantsData']) &&
+             data.participantIds is list &&
+             data.participantIds.size() == 2 &&
+             request.auth.uid in data.participantIds;
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['senderId', 'content', 'type', 'timestamp']) &&
+             isValidString(data.content, 10000) &&
+             (data.senderId == request.auth.uid || data.senderId == 'system');
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isOwner(userId) || isAdmin(); 
+    }
+
+    match /profiles/{profileId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(profileId) && isValidUser(request.resource.data);
+      allow update: if isOwner(profileId) && isValidUser(request.resource.data);
+      allow delete: if isOwner(profileId) || isAdmin();
+    }
+    
+    match /calls/{callId} {
+      allow read, create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+    
+    match /chats/{chatId} {
+      allow read, update: if isAuthenticated() && 
+                             (isAdmin() || request.auth.uid in resource.data.participantIds);
+      
+      allow create: if isAuthenticated() && isValidChat(request.resource.data);
+      allow delete: if isAdmin() || (isAuthenticated() && request.auth.uid in resource.data.participantIds);
+
+      match /messages/{messageId} {
+         allow read: if isAuthenticated() && 
+                        (isAdmin() || request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds);
+         
+         allow create: if isAuthenticated() && 
+                          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds && 
+                          isValidMessage(request.resource.data);
+         
+         allow update: if isAuthenticated() && 
+                          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participantIds &&
+                          (
+                            request.auth.uid == resource.data.senderId ||
+                            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions', 'deletedFor', 'status', 'content', 'editedAt'])
+                          );
+         
+         allow delete: if isAdmin();
+      }
+    }
+  }
+}
